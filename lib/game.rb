@@ -4,15 +4,12 @@ require 'byebug'
 
 class Game
 
-  attr_reader :players, :current_player, :player_index, :deck, :winners
+  attr_reader :players, :human_players, :ai_players, :current_player, :player_index, :deck, :winners
 
   def initialize(deck)
     @deck = deck
     @players = []
-    create_players(deck)
-    create_ai_players(deck)
-    check_players
-    update_ai_players
+    create_players
     @current_player_index = 0
     @current_player = players[0]
     @player_index = index_players
@@ -20,33 +17,61 @@ class Game
     @empty_players = []
   end
 
+  def create_players
+    begin
+      new_human_players
+      new_ai_players
+      check_players
+    rescue ArgumentError => e
+      puts e.message
+      retry
+    end
+    human_players.each do |player|
+      @players.push(Player.new(player, deck))
+    end
+    ai_players.each do |player|
+      @players.push(AIPlayer.new(player, deck))
+    end
+    update_ai_players
+  end
+
   def check_players
-    if players.length > 10
+    total_players = human_players.length + ai_players.length
+    all_names = ai_players + human_players
+    if total_players > 10
       raise ArgumentError.new("Cannot have more than 10 players bro")
     end
     name_hash = Hash.new(0)
-    players.each do |player|
-      if name_hash[player.name] > 0
+    all_names.each do |name|
+      if name_hash[name] > 0
         raise ArgumentError.new('It is impossible for two people to have the same name')
       else
-        name_hash[player.name] += 1
+        name_hash[name] += 1
       end
     end
   end
 
-  def create_players(deck)
+  def new_human_players
+    @human_players = []
+    #don't actually create players here, because we may prematurely
+    #error out (from running out the deck) before we hit the errors
+    #in check_players
     puts "Enter the names for all players below (separated by SPACES): "
     input = gets.chomp.split(' ')
     input.each do |player|
-      @players.push(Player.new(player, deck))
+      human_players.push(player)
     end
   end
 
-  def create_ai_players(deck)
+  def new_ai_players
+    @ai_players = []
+    #don't actually create players here, because we may prematurely
+    #error out (from running out the deck) before we hit the errors
+    #in check_players
     puts "Enter the names for all AI players below (use spaces!): "
     input = gets.chomp.split(' ')
     input.each do |player|
-      @players.push(AIPlayer.new(player, deck))
+      ai_players.push(player)
     end
   end
 
