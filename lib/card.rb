@@ -16,7 +16,7 @@ class Card
   end
 
   def to_s
-    print "#{value} of #{suit}"
+    return "#{value} of #{suit}"
   end
 
 end

@@ -12,10 +12,10 @@ class Player
   end
 
   def to_s
-    puts name
     hand.each do |card|
       puts card
     end
+    return ''
   end
 
   def count
@@ -23,7 +23,7 @@ class Player
   end
 
   def get_input
-    puts "#{name}, pick one of your cards (no spaces please): "
+    puts "#{name}, pick one of your cards (no spaces please):\n "
     puts self
     value = gets.chomp.to_sym
     if !include?(value)
