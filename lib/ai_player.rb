@@ -1,31 +1,18 @@
 require 'byebug'
+require_relative 'player'
 
-class AIPlayer
-
-  attr_reader :name, :winning_cards
+class AIPlayer < Player
 
   def initialize(name,deck)
-    @name = name
-    @hand = deck.take(5)
-    @deck = deck
-    @winning_cards = []
+    super(name, deck)
     @mrroboto = {}
   end
 
-  def to_s
-    puts name
-    hand.each do |card|
-      puts card
-    end
-  end
 
   def add_players_arr(arr)
     @players = arr.select { |player| player.name != name}
   end
 
-  def count
-    hand.length
-  end
 
   def get_input
     # debugger
@@ -68,56 +55,11 @@ class AIPlayer
     end
   end
 
-  def include?(value)
-    hand.any?{ |card| card.value == value}
-  end
-
-  def remove(value)
-    cards = hand.select { |card| card.value == value}
-    self.hand = hand.select { |card| card.value != value}
-    return cards
-  end
-
-  #adds other player's cards to self hand
-  def add(cards)
-    self.hand = hand + cards
-  end
-
-
-  def go_fish
-    self.hand = hand + @deck.take(1)
-  end
-
-  def remove_quads
-    quads = find_quads
-    hand.each do |card|
-      if quads[card.value] != nil
-        @winning_cards.push(card)
-      end
-    end
-    @hand = @hand.select { |card| quads[card.value] == nil}
-  end
-
-
-  def find_quads
-    counter_hsh = Hash.new(0)
-    hand.each do |card|
-      counter_hsh[card.value] += 1
-    end
-    quads = counter_hsh.select{ |k,v| v==4 }
-    quads
-  end
-
-  #return how many matches (four of a kind) the player has
-  def matches
-    winning_cards.length / 4
-  end
 
   protected
 
   attr_reader :players
-  attr_accessor :hand, :mrroboto
-
+  attr_accessor :mrroboto
 
 
 end
